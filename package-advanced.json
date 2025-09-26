@@ -1,0 +1,138 @@
+{
+  "name": "busreserva-pro-iphone-edition",
+  "version": "3.0.0",
+  "description": "Sistema Ultra Avanzado de Reserva de Autobuses - Estilo iPhone con IA y Funcionalidades Premium",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "iphone": "node server.js",
+    "install-db": "mysql -u root -p < database.sql",
+    "test": "jest --coverage",
+    "lint": "eslint . --fix",
+    "build": "webpack --mode production",
+    "deploy": "pm2 start server.js --name busreserva-pro"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mysql2": "^3.6.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "jsonwebtoken": "^9.0.2",
+    "bcrypt": "^5.1.1",
+    "express-rate-limit": "^7.1.5",
+    "helmet": "^7.1.0",
+    "compression": "^1.7.4",
+    "node-cache": "^5.1.2",
+    "ws": "^8.14.2",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.9.7",
+    "geolib": "^3.3.4",
+    "socket.io": "^4.7.4",
+    "redis": "^4.6.10",
+    "express-validator": "^7.0.1",
+    "winston": "^3.11.0",
+    "moment": "^2.29.4",
+    "axios": "^1.6.2",
+    "sharp": "^0.32.6",
+    "multer": "^1.4.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "jest": "^29.7.0",
+    "eslint": "^8.55.0",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4",
+    "pm2": "^5.3.0"
+  },
+  "keywords": [
+    "autobuses",
+    "reservas",
+    "iphone-style",
+    "ios-design",
+    "sistema-inteligente",
+    "mysql",
+    "express",
+    "nodejs",
+    "websocket",
+    "real-time",
+    "geolocation",
+    "machine-learning",
+    "ai-powered",
+    "smart-booking",
+    "bus-reservation",
+    "transport-management",
+    "intelligent-system",
+    "predictive-analytics",
+    "notifications",
+    "premium-ui",
+    "mobile-first",
+    "responsive-design"
+  ],
+  "author": {
+    "name": "BusReserva Pro Team",
+    "email": "admin@busreservapro.com",
+    "url": "https://busreservapro.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/busreservapro/iphone-edition.git"
+  },
+  "bugs": {
+    "url": "https://github.com/busreservapro/iphone-edition/issues"
+  },
+  "homepage": "https://github.com/busreservapro/iphone-edition#readme",
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "config": {
+    "port": 3000,
+    "database": "bus_reservation",
+    "jwt_expiry": "24h",
+    "cache_ttl": 300,
+    "rate_limit": 100,
+    "websocket_enabled": true,
+    "geolocation_enabled": true,
+    "notifications_enabled": true,
+    "analytics_enabled": true
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coverageDirectory": "coverage",
+    "collectCoverageFrom": [
+      "**/*.js",
+      "!node_modules/**",
+      "!coverage/**"
+    ]
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "es2021": true
+    },
+    "extends": "eslint:recommended",
+    "rules": {
+      "no-console": "warn",
+      "no-unused-vars": "error"
+    }
+  },
+  "features": {
+    "real_time_notifications": true,
+    "geolocation_services": true,
+    "price_prediction": true,
+    "smart_recommendations": true,
+    "popular_routes_analytics": true,
+    "email_notifications": true,
+    "websocket_support": true,
+    "iphone_optimized_ui": true,
+    "advanced_search": true,
+    "nearby_stations": true,
+    "price_alerts": true,
+    "travel_reminders": true,
+    "demand_analysis": true,
+    "route_optimization": true,
+    "user_preferences": true
+  }
+}

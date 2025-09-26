@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BusReserva Ultra - Sistema de Nueva Generación</title>
+    <link rel="stylesheet" href="ultra-styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navegación Ultra -->
+    <nav class="ultra-nav">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-bus-alt"></i>
+                <span>BusReserva Ultra</span>
+            </div>
+            <div class="nav-menu">
+                <a href="#home" class="nav-link active">Inicio</a>
+                <a href="#search" class="nav-link">Buscar</a>
+                <a href="#features" class="nav-link">Características</a>
+                <a href="#account" class="nav-link">Mi Cuenta</a>
+            </div>
+            <div class="nav-actions">
+                <button class="notification-btn" id="notificationBtn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </button>
+                <button class="profile-btn" id="profileBtn">
+                    <i class="fas fa-user-circle"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section Ultra -->
+    <section id="home" class="hero-ultra">
+        <div class="hero-background">
+            <div class="gradient-orb orb-1"></div>
+            <div class="gradient-orb orb-2"></div>
+            <div class="gradient-orb orb-3"></div>
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title">
+                El Futuro de los
+                <span class="gradient-text">Viajes en Autobús</span>
+            </h1>
+            <p class="hero-subtitle">
+                Experiencia de reserva inteligente con IA, precios dinámicos y tecnología de vanguardia
+            </p>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">1M+</span>
+                    <span class="stat-label">Viajeros</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">500+</span>
+                    <span class="stat-label">Rutas</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">99.9%</span>
+                    <span class="stat-label">Confiabilidad</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Búsqueda Inteligente -->
+    <section id="search" class="search-ultra">
+        <div class="container">
+            <div class="search-header">
+                <h2>Búsqueda Inteligente con IA</h2>
+                <p>Encuentra el viaje perfecto con nuestro sistema de recomendaciones avanzado</p>
+            </div>
+            
+            <div class="search-card">
+                <div class="search-tabs">
+                    <button class="tab-btn active" data-tab="one-way">
+                        <i class="fas fa-arrow-right"></i>
+                        Solo ida
+                    </button>
+                    <button class="tab-btn" data-tab="round-trip">
+                        <i class="fas fa-exchange-alt"></i>
+                        Ida y vuelta
+                    </button>
+                    <button class="tab-btn" data-tab="flexible">
+                        <i class="fas fa-calendar-alt"></i>
+                        Fechas flexibles
+                    </button>
+                </div>
+
+                <form class="search-form" id="searchForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Origen</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <input type="text" id="origin" placeholder="¿Desde dónde viajas?" autocomplete="off">
+                                <button type="button" class="location-btn" id="useLocationBtn">
+                                    <i class="fas fa-crosshairs"></i>
+                                </button>
+                            </div>
+                            <div class="suggestions" id="originSuggestions"></div>
+                        </div>
+                        
+                        <button type="button" class="swap-btn" id="swapBtn">
+                            <i class="fas fa-exchange-alt"></i>
+                        </button>
+                        
+                        <div class="form-group">
+                            <label>Destino</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <input type="text" id="destination" placeholder="¿A dónde vas?" autocomplete="off">
+                            </div>
+                            <div class="suggestions" id="destinationSuggestions"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Fecha de salida</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-calendar"></i>
+                                <input type="date" id="departureDate">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group" id="returnDateGroup" style="display: none;">
+                            <label>Fecha de regreso</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-calendar"></i>
+                                <input type="date" id="returnDate">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Pasajeros</label>
+                            <div class="passenger-selector">
+                                <button type="button" class="passenger-btn" id="decreasePassengers">-</button>
+                                <span class="passenger-count" id="passengerCount">1</span>
+                                <button type="button" class="passenger-btn" id="increasePassengers">+</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="search-options">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="flexibleDates">
+                            <span class="checkmark"></span>
+                            Fechas flexibles (±3 días)
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="onlyDirect">
+                            <span class="checkmark"></span>
+                            Solo viajes directos
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="priceAlerts">
+                            <span class="checkmark"></span>
+                            Alertas de precio
+                        </label>
+                    </div>
+
+                    <button type="submit" class="search-btn">
+                        <i class="fas fa-search"></i>
+                        Buscar Viajes Inteligentes
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resultados de Búsqueda -->
+    <section class="results-section" id="resultsSection" style="display: none;">
+        <div class="container">
+            <div class="results-header">
+                <h3>Resultados de Búsqueda</h3>
+                <div class="results-filters">
+                    <select id="sortBy">
+                        <option value="price">Precio</option>
+                        <option value="time">Hora de salida</option>
+                        <option value="duration">Duración</option>
+                        <option value="rating">Calificación</option>
+                    </select>
+                    <button class="filter-btn" id="filterBtn">
+                        <i class="fas fa-filter"></i>
+                        Filtros
+                    </button>
+                </div>
+            </div>
+            <div class="results-grid" id="resultsGrid"></div>
+        </div>
+    </section>
+
+    <!-- Características Ultra -->
+    <section id="features" class="features-ultra">
+        <div class="container">
+            <div class="features-header">
+                <h2>Características de Nueva Generación</h2>
+                <p>Tecnología avanzada para una experiencia de viaje superior</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>IA Predictiva</h3>
+                    <p>Algoritmos de machine learning para predecir precios y recomendar los mejores viajes</p>
+                    <div class="feature-stats">
+                        <span>95% precisión</span>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Precios Dinámicos</h3>
+                    <p>Precios que se ajustan en tiempo real según demanda, disponibilidad y factores externos</p>
+                    <div class="feature-stats">
+                        <span>Ahorra hasta 30%</span>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-satellite-dish"></i>
+                    </div>
+                    <h3>Tiempo Real</h3>
+                    <p>Seguimiento GPS en vivo, notificaciones instantáneas y actualizaciones de estado</p>
+                    <div class="feature-stats">
+                        <span>100% conectado</span>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Seguridad Avanzada</h3>
+                    <p>Autenticación biométrica, encriptación end-to-end y protección de datos</p>
+                    <div class="feature-stats">
+                        <span>Certificado ISO 27001</span>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <h3>Eco-Friendly</h3>
+                    <p>Cálculo de huella de carbono, compensación automática y rutas optimizadas</p>
+                    <div class="feature-stats">
+                        <span>Carbono neutral</span>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>App Nativa</h3>
+                    <p>Aplicación móvil con realidad aumentada, check-in automático y wallet digital</p>
+                    <div class="feature-stats">
+                        <span>4.9★ rating</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Panel de Notificaciones -->
+    <div class="notification-panel" id="notificationPanel">
+        <div class="panel-header">
+            <h3>Notificaciones</h3>
+            <button class="close-btn" id="closeNotifications">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="notifications-list">
+            <div class="notification-item unread">
+                <div class="notification-icon">
+                    <i class="fas fa-ticket-alt"></i>
+                </div>
+                <div class="notification-content">
+                    <h4>Reserva Confirmada</h4>
+                    <p>Tu viaje Madrid → Barcelona ha sido confirmado</p>
+                    <span class="notification-time">Hace 5 min</span>
+                </div>
+            </div>
+            <div class="notification-item">
+                <div class="notification-icon">
+                    <i class="fas fa-percentage"></i>
+                </div>
+                <div class="notification-content">
+                    <h4>Oferta Especial</h4>
+                    <p>20% de descuento en tu próximo viaje</p>
+                    <span class="notification-time">Hace 1 hora</span>
+                </div>
+            </div>
+            <div class="notification-item">
+                <div class="notification-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="notification-content">
+                    <h4>Recordatorio</h4>
+                    <p>Tu viaje es mañana a las 08:00</p>
+                    <span class="notification-time">Hace 2 horas</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Login/Registro -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="authTitle">Iniciar Sesión</h3>
+                <button class="close-btn" id="closeAuthModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="authForm">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="authEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Contraseña</label>
+                        <input type="password" id="authPassword" required>
+                    </div>
+                    <div class="form-group" id="authNameGroup" style="display: none;">
+                        <label>Nombre completo</label>
+                        <input type="text" id="authName">
+                    </div>
+                    <div class="form-group" id="authPhoneGroup" style="display: none;">
+                        <label>Teléfono</label>
+                        <input type="tel" id="authPhone">
+                    </div>
+                    <button type="submit" class="auth-btn" id="authSubmitBtn">Iniciar Sesión</button>
+                </form>
+                <div class="auth-switch">
+                    <p id="authSwitchText">¿No tienes cuenta? <a href="#" id="authSwitchLink">Regístrate</a></p>
+                </div>
+                <div class="social-auth">
+                    <button class="social-btn google">
+                        <i class="fab fa-google"></i>
+                        Continuar con Google
+                    </button>
+                    <button class="social-btn facebook">
+                        <i class="fab fa-facebook-f"></i>
+                        Continuar con Facebook
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Ultra -->
+    <footer class="footer-ultra">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-brand">
+                        <i class="fas fa-bus-alt"></i>
+                        <span>BusReserva Ultra</span>
+                    </div>
+                    <p>El futuro de los viajes en autobús está aquí. Tecnología avanzada, experiencia superior.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Servicios</h4>
+                    <ul>
+                        <li><a href="#">Reservas Online</a></li>
+                        <li><a href="#">App Móvil</a></li>
+                        <li><a href="#">Seguimiento GPS</a></li>
+                        <li><a href="#">Alertas de Precio</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Soporte</h4>
+                    <ul>
+                        <li><a href="#">Centro de Ayuda</a></li>
+                        <li><a href="#">Chat en Vivo</a></li>
+                        <li><a href="#">Políticas</a></li>
+                        <li><a href="#">Términos</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contacto</h4>
+                    <ul>
+                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                        <li><i class="fas fa-envelope"></i> info@busreserva.com</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Madrid, España</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 BusReserva Ultra. Todos los derechos reservados.</p>
+                <div class="footer-badges">
+                    <span class="badge">ISO 27001</span>
+                    <span class="badge">SSL Seguro</span>
+                    <span class="badge">Carbono Neutral</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="ultra-app.js"></script>
+</body>
+</html>

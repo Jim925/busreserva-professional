@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BusReserva Professional - Sistema de Gestión de Transporte</title>
+    <link rel="stylesheet" href="professional-styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navegación Profesional -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-bus"></i>
+                <span>BusReserva</span>
+                <span class="brand-tag">Professional</span>
+            </div>
+            <div class="nav-menu">
+                <a href="#home" class="nav-link active">Inicio</a>
+                <a href="#search" class="nav-link">Reservas</a>
+                <a href="#services" class="nav-link">Servicios</a>
+                <a href="#contact" class="nav-link">Contacto</a>
+            </div>
+            <div class="nav-actions">
+                <button class="btn-secondary" id="loginBtn">Iniciar Sesión</button>
+                <button class="btn-primary" id="registerBtn">Registrarse</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section Profesional -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>Sistema Profesional de Reservas de Transporte</h1>
+                <p>Solución integral para la gestión y reserva de viajes en autobús. Tecnología avanzada, seguridad garantizada y experiencia de usuario excepcional.</p>
+                <div class="hero-actions">
+                    <button class="btn-primary btn-large">Comenzar Ahora</button>
+                    <button class="btn-outline btn-large">Ver Demo</button>
+                </div>
+            </div>
+            <div class="hero-stats">
+                <div class="stat">
+                    <span class="stat-number">500K+</span>
+                    <span class="stat-label">Usuarios Activos</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">1,200+</span>
+                    <span class="stat-label">Rutas Disponibles</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">99.8%</span>
+                    <span class="stat-label">Confiabilidad</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Búsqueda Profesional -->
+    <section id="search" class="search-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Reserva tu Viaje</h2>
+                <p>Sistema de búsqueda inteligente con resultados en tiempo real</p>
+            </div>
+            
+            <div class="search-container">
+                <form class="search-form" id="searchForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Origen</label>
+                            <div class="input-container">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <input type="text" id="origin" placeholder="Ciudad de origen" autocomplete="off">
+                                <button type="button" class="location-btn" id="useLocationBtn">
+                                    <i class="fas fa-crosshairs"></i>
+                                </button>
+                            </div>
+                            <div class="suggestions" id="originSuggestions"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Destino</label>
+                            <div class="input-container">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <input type="text" id="destination" placeholder="Ciudad de destino" autocomplete="off">
+                            </div>
+                            <div class="suggestions" id="destinationSuggestions"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Fecha de Salida</label>
+                            <div class="input-container">
+                                <i class="fas fa-calendar"></i>
+                                <input type="date" id="departureDate">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Pasajeros</label>
+                            <div class="passenger-control">
+                                <button type="button" class="passenger-btn" id="decreasePassengers">-</button>
+                                <span class="passenger-count" id="passengerCount">1</span>
+                                <button type="button" class="passenger-btn" id="increasePassengers">+</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="search-options">
+                        <label class="checkbox">
+                            <input type="checkbox" id="flexibleDates">
+                            <span class="checkmark"></span>
+                            Fechas flexibles
+                        </label>
+                        <label class="checkbox">
+                            <input type="checkbox" id="directOnly">
+                            <span class="checkmark"></span>
+                            Solo viajes directos
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-search">
+                        <i class="fas fa-search"></i>
+                        Buscar Viajes
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resultados de Búsqueda -->
+    <section class="results-section" id="resultsSection" style="display: none;">
+        <div class="container">
+            <div class="results-header">
+                <h3>Viajes Disponibles</h3>
+                <div class="results-controls">
+                    <select id="sortBy" class="select-control">
+                        <option value="price">Ordenar por precio</option>
+                        <option value="time">Ordenar por hora</option>
+                        <option value="duration">Ordenar por duración</option>
+                    </select>
+                    <button class="btn-outline btn-small" id="filterBtn">
+                        <i class="fas fa-filter"></i>
+                        Filtros
+                    </button>
+                </div>
+            </div>
+            <div class="results-list" id="resultsList"></div>
+        </div>
+    </section>
+
+    <!-- Servicios -->
+    <section id="services" class="services-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Nuestros Servicios</h2>
+                <p>Soluciones integrales para todas tus necesidades de transporte</p>
+            </div>
+            
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-ticket-alt"></i>
+                    </div>
+                    <h3>Reservas Online</h3>
+                    <p>Sistema de reservas 24/7 con confirmación instantánea y gestión completa de boletos.</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-route"></i>
+                    </div>
+                    <h3>Rutas Optimizadas</h3>
+                    <p>Red de rutas inteligente con horarios optimizados y conexiones eficientes.</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Viajes Seguros</h3>
+                    <p>Flota moderna con mantenimiento preventivo y conductores certificados.</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3>Soporte 24/7</h3>
+                    <p>Atención al cliente profesional disponible las 24 horas del día.</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>App Móvil</h3>
+                    <p>Aplicación nativa para iOS y Android con todas las funcionalidades.</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Analytics</h3>
+                    <p>Reportes detallados y análisis de datos para optimizar operaciones.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal de Autenticación -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="authTitle">Iniciar Sesión</h3>
+                <button class="modal-close" id="closeAuthModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="authForm">
+                    <div class="form-group">
+                        <label>Correo Electrónico</label>
+                        <input type="email" id="authEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Contraseña</label>
+                        <input type="password" id="authPassword" required>
+                    </div>
+                    <div class="form-group" id="authNameGroup" style="display: none;">
+                        <label>Nombre Completo</label>
+                        <input type="text" id="authName">
+                    </div>
+                    <div class="form-group" id="authPhoneGroup" style="display: none;">
+                        <label>Teléfono</label>
+                        <input type="tel" id="authPhone">
+                    </div>
+                    <button type="submit" class="btn-primary btn-full" id="authSubmitBtn">Iniciar Sesión</button>
+                </form>
+                <div class="auth-switch">
+                    <p id="authSwitchText">¿No tienes cuenta? <a href="#" id="authSwitchLink">Crear cuenta</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Profesional -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-brand">
+                        <i class="fas fa-bus"></i>
+                        <span>BusReserva Professional</span>
+                    </div>
+                    <p>Solución profesional para la gestión integral de transporte de pasajeros.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Servicios</h4>
+                    <ul>
+                        <li><a href="#">Reservas Online</a></li>
+                        <li><a href="#">Gestión de Flota</a></li>
+                        <li><a href="#">Reportes y Analytics</a></li>
+                        <li><a href="#">Soporte Técnico</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Empresa</h4>
+                    <ul>
+                        <li><a href="#">Acerca de Nosotros</a></li>
+                        <li><a href="#">Términos de Servicio</a></li>
+                        <li><a href="#">Política de Privacidad</a></li>
+                        <li><a href="#">Contacto</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contacto</h4>
+                    <ul>
+                        <li><i class="fas fa-phone"></i> +34 900 123 456</li>
+                        <li><i class="fas fa-envelope"></i> info@busreserva.com</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Madrid, España</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 BusReserva Professional. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="professional-app.js"></script>
+</body>
+</html>

@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 BusReserva Pro - Panel Administrativo</title>
+    <link rel="stylesheet" href="professional-styles.css">
+    <style>
+        :root {
+            --primary: #1e40af;
+            --primary-dark: #1e3a8a;
+            --secondary: #64748b;
+            --success: #059669;
+            --danger: #dc2626;
+            --warning: #d97706;
+            --light: #f8fafc;
+            --dark: #0f172a;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); 
+            min-height: 100vh;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header { 
+            text-align: center; 
+            color: white; 
+            margin-bottom: 3rem;
+            padding: 2rem 0;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.125rem;
+            opacity: 0.9;
+        }
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        }
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 2rem; 
+            margin-bottom: 3rem; 
+        }
+        .stat-card { 
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); 
+            color: white; 
+            padding: 2rem; 
+            border-radius: 16px; 
+            text-align: center;
+            transition: transform 0.2s;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+        }
+        .stat-number { 
+            font-size: 3rem; 
+            font-weight: 700; 
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .stat-label { 
+            font-size: 1.125rem; 
+            opacity: 0.95;
+            font-weight: 500;
+        }
+        .btn { background: #667eea; color: white; padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; margin: 5px; }
+        .btn:hover { background: #5a6fd8; }
+        .btn-danger { background: #dc3545; }
+        .btn-success { background: #28a745; }
+        .table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .table th, .table td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        .table th { background: #f8f9fa; font-weight: bold; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 5px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .alert { padding: 15px; border-radius: 8px; margin: 10px 0; }
+        .alert-success { background: #d4edda; color: #155724; }
+        .alert-error { background: #f8d7da; color: #721c24; }
+        .tabs { display: flex; margin-bottom: 20px; }
+        .tab { padding: 12px 25px; background: #f8f9fa; border: none; cursor: pointer; border-radius: 8px 8px 0 0; margin-right: 5px; }
+        .tab.active { background: #667eea; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Fondo Animado Profesional -->
+        <div class="animated-background"></div>
+        
+        <div class="header fade-in">
+            <h1>📊 Panel de Administración</h1>
+            <p>Sistema de Gestión de Autobuses</p>
+            <div class="subtitle">
+                Analytics • Gestión • Control Total
+            </div>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalReservations">-</div>
+                <div class="stat-label">Total Reservas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalRevenue">€-</div>
+                <div class="stat-label">Ingresos Totales</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalUsers">-</div>
+                <div class="stat-label">Usuarios Registrados</div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('buses')">🚌 Autobuses</button>
+            <button class="tab" onclick="showTab('routes')">🛣️ Rutas</button>
+            <button class="tab" onclick="showTab('schedules')">⏰ Horarios</button>
+            <button class="tab" onclick="showTab('reservations')">🎫 Reservas</button>
+        </div>
+
+        <!-- Gestión de Autobuses -->
+        <div id="buses" class="tab-content active">
+            <div class="card">
+                <h2>🚌 Gestión de Autobuses</h2>
+                <div class="grid">
+                    <div>
+                        <h3>Agregar Nuevo Autobús</h3>
+                        <div class="form-group">
+                            <label>Número de Autobús:</label>
+                            <input type="text" id="busNumber" placeholder="BUS001">
+                        </div>
+                        <div class="form-group">
+                            <label>Capacidad:</label>
+                            <input type="number" id="busCapacity" placeholder="40">
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo:</label>
+                            <select id="busType">
+                                <option value="economico">Económico</option>
+                                <option value="ejecutivo">Ejecutivo</option>
+                                <option value="premium">Premium</option>
+                            </select>
+                        </div>
+                        <button class="btn" onclick="addBus()">➕ Agregar Autobús</button>
+                    </div>
+                    <div>
+                        <h3>Lista de Autobuses</h3>
+                        <div id="busList"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gestión de Rutas -->
+        <div id="routes" class="tab-content">
+            <div class="card">
+                <h2>🛣️ Gestión de Rutas</h2>
+                <div class="grid">
+                    <div>
+                        <h3>Agregar Nueva Ruta</h3>
+                        <div class="form-group">
+                            <label>Origen:</label>
+                            <input type="text" id="routeOrigin" placeholder="Madrid">
+                        </div>
+                        <div class="form-group">
+                            <label>Destino:</label>
+                            <input type="text" id="routeDestination" placeholder="Barcelona">
+                        </div>
+                        <div class="form-group">
+                            <label>Distancia (km):</label>
+                            <input type="number" id="routeDistance" placeholder="620">
+                        </div>
+                        <div class="form-group">
+                            <label>Duración (horas):</label>
+                            <input type="number" step="0.1" id="routeDuration" placeholder="6.5">
+                        </div>
+                        <div class="form-group">
+                            <label>Precio (€):</label>
+                            <input type="number" step="0.01" id="routePrice" placeholder="45.00">
+                        </div>
+                        <button class="btn" onclick="addRoute()">➕ Agregar Ruta</button>
+                    </div>
+                    <div>
+                        <h3>Lista de Rutas</h3>
+                        <div id="routesList"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gestión de Horarios -->
+        <div id="schedules" class="tab-content">
+            <div class="card">
+                <h2>⏰ Gestión de Horarios</h2>
+                <div class="grid">
+                    <div>
+                        <h3>Programar Viaje</h3>
+                        <div class="form-group">
+                            <label>Autobús:</label>
+                            <select id="scheduleBus"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Ruta:</label>
+                            <select id="scheduleRoute"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Hora de Salida:</label>
+                            <input type="time" id="scheduleDeparture">
+                        </div>
+                        <div class="form-group">
+                            <label>Hora de Llegada:</label>
+                            <input type="time" id="scheduleArrival">
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha:</label>
+                            <input type="date" id="scheduleDate">
+                        </div>
+                        <button class="btn" onclick="addSchedule()">➕ Programar Viaje</button>
+                    </div>
+                    <div>
+                        <h3>Horarios Programados</h3>
+                        <div id="schedulesList"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gestión de Reservas -->
+        <div id="reservations" class="tab-content">
+            <div class="card">
+                <h2>🎫 Gestión de Reservas</h2>
+                <div id="reservationsList"></div>
+            </div>
+        </div>
+
+        <div id="alerts"></div>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        function showAlert(message, type = 'success') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            document.getElementById('alerts').appendChild(alertDiv);
+            
+            setTimeout(() => alertDiv.remove(), 5000);
+        }
+
+        // Cargar estadísticas
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/admin/stats');
+                const stats = await response.json();
+                
+                document.getElementById('totalReservations').textContent = stats.total_reservations;
+                document.getElementById('totalRevenue').textContent = '€' + stats.total_revenue;
+                document.getElementById('totalUsers').textContent = stats.total_users;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Funciones para autobuses
+        async function addBus() {
+            const number = document.getElementById('busNumber').value;
+            const capacity = document.getElementById('busCapacity').value;
+            const type = document.getElementById('busType').value;
+
+            if (!number || !capacity) {
+                showAlert('Todos los campos son requeridos', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/buses', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ number, capacity: parseInt(capacity), type })
+                });
+
+                if (response.ok) {
+                    showAlert('Autobús agregado exitosamente');
+                    document.getElementById('busNumber').value = '';
+                    document.getElementById('busCapacity').value = '';
+                    loadBuses();
+                } else {
+                    const error = await response.json();
+                    showAlert(error.error, 'error');
+                }
+            } catch (error) {
+                showAlert('Error al agregar autobús', 'error');
+            }
+        }
+
+        async function loadBuses() {
+            try {
+                const response = await fetch('/api/buses');
+                const buses = await response.json();
+                
+                const busList = document.getElementById('busList');
+                busList.innerHTML = buses.map(bus => `
+                    <div style="background: #f8f9fa; padding: 10px; margin: 5px 0; border-radius: 5px;">
+                        <strong>${bus.number}</strong> - ${bus.capacity} asientos (${bus.type})
+                        <span style="float: right; color: ${bus.status === 'activo' ? 'green' : 'red'};">
+                            ${bus.status}
+                        </span>
+                    </div>
+                `).join('');
+
+                // Actualizar select de horarios
+                const scheduleBus = document.getElementById('scheduleBus');
+                scheduleBus.innerHTML = '<option value="">Seleccionar autobús</option>' +
+                    buses.filter(bus => bus.status === 'activo')
+                          .map(bus => `<option value="${bus.id}">${bus.number} (${bus.type})</option>`)
+                          .join('');
+            } catch (error) {
+                console.error('Error loading buses:', error);
+            }
+        }
+
+        // Funciones para rutas
+        async function addRoute() {
+            const origin = document.getElementById('routeOrigin').value;
+            const destination = document.getElementById('routeDestination').value;
+            const distance = document.getElementById('routeDistance').value;
+            const duration = document.getElementById('routeDuration').value;
+            const price = document.getElementById('routePrice').value;
+
+            if (!origin || !destination || !price) {
+                showAlert('Origen, destino y precio son requeridos', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/routes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        origin, destination, 
+                        distance_km: distance ? parseInt(distance) : null,
+                        duration_hours: duration ? parseFloat(duration) : null,
+                        price: parseFloat(price)
+                    })
+                });
+
+                if (response.ok) {
+                    showAlert('Ruta agregada exitosamente');
+                    document.getElementById('routeOrigin').value = '';
+                    document.getElementById('routeDestination').value = '';
+                    document.getElementById('routeDistance').value = '';
+                    document.getElementById('routeDuration').value = '';
+                    document.getElementById('routePrice').value = '';
+                    loadRoutes();
+                } else {
+                    const error = await response.json();
+                    showAlert(error.error, 'error');
+                }
+            } catch (error) {
+                showAlert('Error al agregar ruta', 'error');
+            }
+        }
+
+        async function loadRoutes() {
+            try {
+                const response = await fetch('/api/routes');
+                const routes = await response.json();
+                
+                const routesList = document.getElementById('routesList');
+                routesList.innerHTML = routes.map(route => `
+                    <div style="background: #f8f9fa; padding: 10px; margin: 5px 0; border-radius: 5px;">
+                        <strong>${route.origin} → ${route.destination}</strong><br>
+                        ${route.distance_km ? route.distance_km + ' km' : ''} 
+                        ${route.duration_hours ? '(' + route.duration_hours + 'h)' : ''} - €${route.price}
+                    </div>
+                `).join('');
+
+                // Actualizar select de horarios
+                const scheduleRoute = document.getElementById('scheduleRoute');
+                scheduleRoute.innerHTML = '<option value="">Seleccionar ruta</option>' +
+                    routes.map(route => `<option value="${route.id}">${route.origin} → ${route.destination}</option>`)
+                           .join('');
+            } catch (error) {
+                console.error('Error loading routes:', error);
+            }
+        }
+
+        // Funciones para horarios
+        async function addSchedule() {
+            const busId = document.getElementById('scheduleBus').value;
+            const routeId = document.getElementById('scheduleRoute').value;
+            const departure = document.getElementById('scheduleDeparture').value;
+            const arrival = document.getElementById('scheduleArrival').value;
+            const date = document.getElementById('scheduleDate').value;
+
+            if (!busId || !routeId || !departure || !arrival || !date) {
+                showAlert('Todos los campos son requeridos', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/schedules', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        bus_id: parseInt(busId),
+                        route_id: parseInt(routeId),
+                        departure_time: departure,
+                        arrival_time: arrival,
+                        departure_date: date
+                    })
+                });
+
+                if (response.ok) {
+                    showAlert('Horario programado exitosamente');
+                    document.getElementById('scheduleBus').value = '';
+                    document.getElementById('scheduleRoute').value = '';
+                    document.getElementById('scheduleDeparture').value = '';
+                    document.getElementById('scheduleArrival').value = '';
+                    document.getElementById('scheduleDate').value = '';
+                    loadSchedules();
+                } else {
+                    const error = await response.json();
+                    showAlert(error.error, 'error');
+                }
+            } catch (error) {
+                showAlert('Error al programar horario', 'error');
+            }
+        }
+
+        async function loadSchedules() {
+            try {
+                const response = await fetch('/api/schedules');
+                const schedules = await response.json();
+                
+                const schedulesList = document.getElementById('schedulesList');
+                schedulesList.innerHTML = schedules.map(schedule => `
+                    <div style="background: #f8f9fa; padding: 10px; margin: 5px 0; border-radius: 5px;">
+                        <strong>${schedule.origin} → ${schedule.destination}</strong><br>
+                        ${schedule.bus_number} (${schedule.bus_type}) - ${schedule.departure_date}<br>
+                        Salida: ${schedule.departure_time} | Llegada: ${schedule.arrival_time}<br>
+                        Asientos disponibles: ${schedule.available_seats}
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading schedules:', error);
+            }
+        }
+
+        async function loadReservations() {
+            try {
+                const response = await fetch('/api/admin/reservations');
+                const reservations = await response.json();
+                
+                const reservationsList = document.getElementById('reservationsList');
+                reservationsList.innerHTML = `
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Usuario</th>
+                                <th>Ruta</th>
+                                <th>Fecha</th>
+                                <th>Asiento</th>
+                                <th>Estado</th>
+                                <th>Precio</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${reservations.map(res => `
+                                <tr>
+                                    <td>${res.id}</td>
+                                    <td>${res.user_name}<br><small>${res.email}</small></td>
+                                    <td>${res.origin} → ${res.destination}</td>
+                                    <td>${res.departure_date}<br>${res.departure_time}</td>
+                                    <td>${res.seat_number}</td>
+                                    <td><span style="color: ${res.status === 'confirmada' ? 'green' : res.status === 'cancelada' ? 'red' : 'orange'}">${res.status}</span></td>
+                                    <td>€${res.total_price}</td>
+                                    <td>
+                                        ${res.status === 'confirmada' ? `<button class="btn btn-danger" onclick="cancelReservation(${res.id})">Cancelar</button>` : '-'}
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) {
+                console.error('Error loading reservations:', error);
+            }
+        }
+
+        async function cancelReservation(reservationId) {
+            if (!confirm('¿Estás seguro de cancelar esta reserva?')) return;
+
+            try {
+                const response = await fetch(`/api/reservations/${reservationId}/cancel`, {
+                    method: 'PUT'
+                });
+
+                if (response.ok) {
+                    showAlert('Reserva cancelada exitosamente');
+                    loadReservations();
+                    loadStats();
+                } else {
+                    const error = await response.json();
+                    showAlert(error.error, 'error');
+                }
+            } catch (error) {
+                showAlert('Error al cancelar reserva', 'error');
+            }
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStats();
+            loadBuses();
+            loadRoutes();
+            loadSchedules();
+            loadReservations();
+            
+            // Configurar fecha mínima
+            document.getElementById('scheduleDate').min = new Date().toISOString().split('T')[0];
+        });
+    </script>
+</body>
+</html>
