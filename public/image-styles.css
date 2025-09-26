@@ -1,0 +1,282 @@
+/* Estilos para Imágenes - BusReserva Professional */
+
+/* Lazy loading placeholder */
+.lazy {
+    background: linear-gradient(135deg, rgba(30, 60, 114, 0.1) 0%, rgba(42, 82, 152, 0.1) 100%);
+    transition: opacity 0.3s ease;
+}
+
+.lazy.loaded {
+    opacity: 1;
+}
+
+/* Hero con imagen de fondo */
+.hero-with-image,
+.hero-ultra-with-image {
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    position: relative;
+}
+
+.hero-with-image::before,
+.hero-ultra-with-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(30, 60, 114, 0.8) 0%, rgba(42, 82, 152, 0.6) 100%);
+    z-index: 1;
+}
+
+.hero-content,
+.hero-ultra .hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+/* Tarjetas de servicio con imágenes */
+.service-card img,
+.feature-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.service-card:hover img,
+.feature-card:hover img {
+    transform: scale(1.05);
+}
+
+/* Tarjetas de viaje con imágenes */
+.trip-card img,
+.smart-trip-card img,
+.route-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 12px rgba(30, 60, 114, 0.1);
+}
+
+/* Avatares de testimonios */
+.testimonial-avatar {
+    width: 60px !important;
+    height: 60px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    margin-right: 1rem !important;
+    border: 3px solid rgba(30, 60, 114, 0.2) !important;
+    box-shadow: 0 4px 12px rgba(30, 60, 114, 0.1) !important;
+}
+
+/* Galería de imágenes */
+.image-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.gallery-item {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(30, 60, 114, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(30, 60, 114, 0.1);
+}
+
+.gallery-item:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(30, 60, 114, 0.2);
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.gallery-item:hover img {
+    transform: scale(1.1);
+}
+
+.gallery-item .caption {
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.gallery-item .caption h4 {
+    margin: 0 0 0.5rem 0;
+    color: #1e3c72;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.gallery-item .caption p {
+    margin: 0;
+    color: #2a5298;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* Secciones con fondo de imagen */
+.section-with-bg {
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    position: relative;
+}
+
+.section-with-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(30, 60, 114, 0.1) 100%);
+    backdrop-filter: blur(2px);
+}
+
+.section-with-bg .container {
+    position: relative;
+    z-index: 2;
+}
+
+/* Efectos de carga para imágenes */
+.image-loading {
+    position: relative;
+    overflow: hidden;
+}
+
+.image-loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(30, 60, 114, 0.2), transparent);
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* Lightbox para imágenes */
+.lightbox {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.lightbox.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.lightbox img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    font-size: 2rem;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.lightbox-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Responsive para imágenes */
+@media (max-width: 768px) {
+    .image-gallery {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .service-card img,
+    .feature-card img {
+        height: 150px;
+    }
+    
+    .trip-card img,
+    .smart-trip-card img,
+    .route-card img {
+        height: 120px;
+    }
+    
+    .testimonial-avatar {
+        width: 50px !important;
+        height: 50px !important;
+    }
+    
+    .gallery-item .caption {
+        padding: 1rem;
+    }
+}
+
+/* Optimización para dispositivos de alta densidad */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .hero-with-image,
+    .hero-ultra-with-image,
+    .section-with-bg {
+        background-size: cover;
+        image-rendering: -webkit-optimize-contrast;
+    }
+}
+
+/* Modo oscuro para imágenes */
+@media (prefers-color-scheme: dark) {
+    .gallery-item {
+        background: rgba(30, 60, 114, 0.1);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .gallery-item .caption {
+        background: rgba(30, 60, 114, 0.2);
+    }
+    
+    .gallery-item .caption h4 {
+        color: #ffffff;
+    }
+    
+    .gallery-item .caption p {
+        color: rgba(255, 255, 255, 0.8);
+    }
+}

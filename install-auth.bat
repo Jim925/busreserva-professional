@@ -1,0 +1,1 @@
+npm install passport passport-google-oauth20 passport-local express-session bcryptjs jsonwebtoken

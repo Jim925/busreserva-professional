@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
@@ -5,11 +6,18 @@ const path = require('path');
 const WebSocket = require('ws');
 const cron = require('node-cron');
 const nodemailer = require('nodemailer');
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const LocalStrategy = require('passport-local').Strategy;
+const session = require('express-session');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 const PORT = 3000;
 const server = require('http').createServer(app);
 const wss = new WebSocket.Server({ server });
+const JWT_SECRET = 'busreserva_secret_key_2024';
 
 // Sistema de notificaciones en tiempo real
 const clients = new Set();
@@ -28,7 +36,7 @@ function broadcast(data) {
 }
 
 // Configuración de email
-const transporter = nodemailer.createTransporter({
+const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: process.env.EMAIL_USER || 'busreserva@gmail.com',
@@ -38,8 +46,19 @@ const transporter = nodemailer.createTransporter({
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true
+}));
 app.use(express.static('public'));
+app.use(session({
+  secret: 'busreserva_session_secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Conexión a MySQL
 const db = mysql.createConnection({
@@ -57,6 +76,95 @@ db.on('error', (err) => {
     console.log('Reconectando...');
   }
 });
+
+// Configuración de Passport
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser((id, done) => {
+  db.query('SELECT * FROM users WHERE id = ?', [id], (err, results) => {
+    if (err) return done(err);
+    done(null, results[0]);
+  });
+});
+
+// Google OAuth Strategy
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID || '123456789-abcdefghijklmnop.apps.googleusercontent.com',
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'GOCSPX-abcdefghijklmnopqrstuvwxyz',
+  callbackURL: '/auth/google/callback'
+}, (accessToken, refreshToken, profile, done) => {
+  db.query('SELECT * FROM users WHERE google_id = ?', [profile.id], (err, results) => {
+    if (err) return done(err);
+    
+    if (results.length > 0) {
+      db.query('UPDATE users SET last_login = NOW() WHERE id = ?', [results[0].id]);
+      return done(null, results[0]);
+    } else {
+      const userData = {
+        name: profile.displayName,
+        email: profile.emails[0].value,
+        google_id: profile.id,
+        profile_picture: profile.photos[0].value,
+        is_verified: true
+      };
+      
+      db.query(
+        'INSERT INTO users (name, email, google_id, profile_picture, is_verified) VALUES (?, ?, ?, ?, ?)',
+        [userData.name, userData.email, userData.google_id, userData.profile_picture, userData.is_verified],
+        (err, result) => {
+          if (err) return done(err);
+          userData.id = result.insertId;
+          return done(null, userData);
+        }
+      );
+    }
+  });
+}));
+
+// Local Strategy
+passport.use(new LocalStrategy({
+  usernameField: 'email',
+  passwordField: 'password'
+}, (email, password, done) => {
+  db.query('SELECT * FROM users WHERE email = ?', [email], async (err, results) => {
+    if (err) return done(err);
+    if (results.length === 0) {
+      return done(null, false, { message: 'Email no encontrado' });
+    }
+    
+    const user = results[0];
+    if (!user.password) {
+      return done(null, false, { message: 'Inicia sesión con Google' });
+    }
+    
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return done(null, false, { message: 'Contraseña incorrecta' });
+    }
+    
+    db.query('UPDATE users SET last_login = NOW() WHERE id = ?', [user.id]);
+    return done(null, user);
+  });
+}));
+
+// Middleware de autenticación
+function authenticateToken(req, res, next) {
+  const token = req.headers.authorization?.split(' ')[1];
+  
+  if (!token) {
+    return res.status(401).json({ error: 'Token requerido' });
+  }
+  
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    res.status(401).json({ error: 'Token inválido' });
+  }
+}
 
 // Ruta básica - Servir página principal
 app.get('/', (req, res) => {
@@ -80,7 +188,12 @@ app.get('/init-db', (req, res) => {
       id INT AUTO_INCREMENT PRIMARY KEY,
       name VARCHAR(100) NOT NULL,
       email VARCHAR(100) UNIQUE NOT NULL,
+      password VARCHAR(255),
       phone VARCHAR(20),
+      google_id VARCHAR(100),
+      profile_picture VARCHAR(500),
+      is_verified BOOLEAN DEFAULT FALSE,
+      last_login TIMESTAMP NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`,
     `CREATE TABLE IF NOT EXISTS buses (
@@ -240,7 +353,7 @@ app.get('/api/search', (req, res) => {
 });
 
 // === RUTAS DE RESERVAS ===
-app.post('/api/reservations', (req, res) => {
+app.post('/api/reservations', authenticateToken, (req, res) => {
   const { user_id, schedule_id, seat_number } = req.body;
   
   if (!user_id || !schedule_id || !seat_number) {
@@ -292,7 +405,7 @@ app.post('/api/reservations', (req, res) => {
   });
 });
 
-app.get('/api/reservations/:userId', (req, res) => {
+app.get('/api/reservations/:userId', authenticateToken, (req, res) => {
   const sql = `
     SELECT res.*, s.departure_time, s.departure_date, r.origin, r.destination, b.number as bus_number
     FROM reservations res
@@ -580,15 +693,120 @@ app.get('/create-database', (req, res) => {
   });
 });
 
-// Middleware de manejo de errores
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Error interno del servidor' });
+// === RUTAS DE AUTENTICACIÓN ===
+
+// Registro tradicional
+app.post('/auth/register', async (req, res) => {
+  const { name, email, password, phone } = req.body;
+  
+  if (!name || !email || !password) {
+    return res.status(400).json({ error: 'Todos los campos son requeridos' });
+  }
+  
+  try {
+    db.query('SELECT * FROM users WHERE email = ?', [email], async (err, results) => {
+      if (err) return res.status(500).json({ error: err.message });
+      
+      if (results.length > 0) {
+        return res.status(409).json({ error: 'El email ya está registrado' });
+      }
+      
+      const hashedPassword = await bcrypt.hash(password, 10);
+      
+      db.query(
+        'INSERT INTO users (name, email, password, phone, is_verified) VALUES (?, ?, ?, ?, ?)',
+        [name, email, hashedPassword, phone, false],
+        (err, result) => {
+          if (err) return res.status(500).json({ error: err.message });
+          
+          const token = jwt.sign({ id: result.insertId, email }, JWT_SECRET, { expiresIn: '24h' });
+          
+          res.status(201).json({
+            message: 'Usuario registrado exitosamente',
+            token,
+            user: { id: result.insertId, name, email, phone }
+          });
+        }
+      );
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
 });
 
-// Middleware para rutas no encontradas
-app.use('*', (req, res) => {
-  res.status(404).json({ error: 'Ruta no encontrada' });
+// Login tradicional
+app.post('/auth/login', (req, res, next) => {
+  passport.authenticate('local', (err, user, info) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (!user) return res.status(401).json({ error: info.message });
+    
+    req.logIn(user, (err) => {
+      if (err) return res.status(500).json({ error: err.message });
+      
+      const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '24h' });
+      
+      res.json({
+        message: 'Inicio de sesión exitoso',
+        token,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          profile_picture: user.profile_picture
+        }
+      });
+    });
+  })(req, res, next);
+});
+
+// Google OAuth
+app.get('/auth/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
+app.get('/auth/google/callback',
+  passport.authenticate('google', { failureRedirect: '/auth.html' }),
+  (req, res) => {
+    const token = jwt.sign({ id: req.user.id, email: req.user.email }, JWT_SECRET, { expiresIn: '24h' });
+    res.redirect(`/?token=${token}&user=${encodeURIComponent(JSON.stringify({
+      id: req.user.id,
+      name: req.user.name,
+      email: req.user.email,
+      profile_picture: req.user.profile_picture
+    }))}`);
+  }
+);
+
+// Logout
+app.post('/auth/logout', (req, res) => {
+  req.logout((err) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ message: 'Sesión cerrada exitosamente' });
+  });
+});
+
+// Verificar token
+app.get('/auth/verify', (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  
+  if (!token) {
+    return res.status(401).json({ error: 'Token no proporcionado' });
+  }
+  
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    db.query('SELECT id, name, email, phone, profile_picture FROM users WHERE id = ?', [decoded.id], (err, results) => {
+      if (err) return res.status(500).json({ error: err.message });
+      if (results.length === 0) {
+        return res.status(404).json({ error: 'Usuario no encontrado' });
+      }
+      
+      res.json({ user: results[0] });
+    });
+  } catch (error) {
+    res.status(401).json({ error: 'Token inválido' });
+  }
 });
 
 // === FUNCIONALIDADES AVANZADAS ===
@@ -704,6 +922,72 @@ app.get('/api/recommendations/:userId', (req, res) => {
   });
 });
 
+// === APIS DE IMÁGENES ===
+
+// Obtener imágenes por categoría
+app.get('/api/images/category/:category', (req, res) => {
+  const { category } = req.params;
+  const { count = 6 } = req.query;
+  
+  const categories = {
+    hero: [
+      { id: 'hero1', url: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=1200&q=80', alt: 'Autobús profesional', author: 'Unsplash' },
+      { id: 'hero2', url: 'https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=1200&q=80', alt: 'Terminal moderna', author: 'Unsplash' }
+    ],
+    buses: [
+      { id: 'bus1', url: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&q=80', alt: 'Autobús moderno', author: 'Unsplash' },
+      { id: 'bus2', url: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&q=80', alt: 'Interior de autobús', author: 'Unsplash' },
+      { id: 'bus3', url: 'https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=800&q=80', alt: 'Terminal de autobuses', author: 'Unsplash' }
+    ],
+    services: [
+      { id: 'service1', url: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&q=80', alt: 'Equipaje de viaje', author: 'Unsplash' },
+      { id: 'service2', url: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=600&q=80', alt: 'Carretera segura', author: 'Unsplash' },
+      { id: 'service3', url: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600&q=80', alt: 'Paisaje de viaje', author: 'Unsplash' }
+    ],
+    cities: [
+      { id: 'city1', url: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=600&q=80', alt: 'Ciudad moderna', author: 'Unsplash' },
+      { id: 'city2', url: 'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=600&q=80', alt: 'Estación de transporte', author: 'Unsplash' },
+      { id: 'city3', url: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1f?w=600&q=80', alt: 'Transporte urbano', author: 'Unsplash' }
+    ],
+    testimonials: [
+      { id: 'test1', url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&q=80', alt: 'Cliente satisfecho', author: 'Unsplash' },
+      { id: 'test2', url: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&q=80', alt: 'Usuaria feliz', author: 'Unsplash' },
+      { id: 'test3', url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&q=80', alt: 'Viajero contento', author: 'Unsplash' }
+    ]
+  };
+  
+  const images = categories[category] || categories.services;
+  res.json(images.slice(0, parseInt(count)));
+});
+
+// Obtener imagen aleatoria por tema
+app.get('/api/images/random/:theme', (req, res) => {
+  const { theme } = req.params;
+  
+  const themes = {
+    transport: [
+      'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&q=80',
+      'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&q=80',
+      'https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=800&q=80'
+    ],
+    travel: [
+      'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80',
+      'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&q=80',
+      'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80'
+    ],
+    city: [
+      'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&q=80',
+      'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=800&q=80',
+      'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1f?w=800&q=80'
+    ]
+  };
+  
+  const urls = themes[theme] || themes.transport;
+  const randomUrl = urls[Math.floor(Math.random() * urls.length)];
+  
+  res.json({ url: randomUrl, alt: `Imagen de ${theme}` });
+});
+
 // Tareas programadas
 cron.schedule('0 9 * * *', () => {
   // Enviar recordatorios de viaje
@@ -741,6 +1025,30 @@ cron.schedule('0 9 * * *', () => {
       });
     }
   });
+});
+
+// Proxy para imágenes (evitar CORS)
+app.get('/api/image-proxy', async (req, res) => {
+  try {
+    const { url } = req.query;
+    if (!url) return res.status(400).json({ error: 'URL requerida' });
+    
+    res.set('Cache-Control', 'public, max-age=86400');
+    res.redirect(url);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al cargar imagen' });
+  }
+});
+
+// Middleware de manejo de errores
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Error interno del servidor' });
+});
+
+// Middleware para rutas no encontradas
+app.use('*', (req, res) => {
+  res.status(404).json({ error: 'Ruta no encontrada' });
 });
 
 // Iniciar servidor con WebSocket

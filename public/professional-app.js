@@ -48,11 +48,15 @@ class BusReservaProfessional {
 
         // Autenticación
         document.getElementById('loginBtn')?.addEventListener('click', () => {
-            this.showAuthModal('login');
+            if (this.currentUser) {
+                this.showUserMenu();
+            } else {
+                window.location.href = '/auth.html';
+            }
         });
 
         document.getElementById('registerBtn')?.addEventListener('click', () => {
-            this.showAuthModal('register');
+            window.location.href = '/auth.html';
         });
 
         document.getElementById('closeAuthModal')?.addEventListener('click', () => {
@@ -405,11 +409,29 @@ class BusReservaProfessional {
         }
     }
 
-    loadUserSession() {
-        const token = localStorage.getItem('userToken');
+    async loadUserSession() {
+        const token = localStorage.getItem('token');
         if (token) {
-            // Aquí podrías verificar el token con el servidor
-            this.updateUIForLoggedUser();
+            try {
+                const response = await fetch('/auth/verify', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    this.currentUser = data.user;
+                    this.updateUIForLoggedUser();
+                } else {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                }
+            } catch (error) {
+                console.error('Error verificando sesión:', error);
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+            }
         }
     }
 
@@ -418,33 +440,149 @@ class BusReservaProfessional {
         const registerBtn = document.getElementById('registerBtn');
         
         if (loginBtn && this.currentUser) {
-            loginBtn.textContent = this.currentUser.name || 'Usuario';
-            loginBtn.onclick = () => this.showUserMenu();
+            loginBtn.innerHTML = `
+                <i class="fas fa-user"></i>
+                ${this.currentUser.name || 'Usuario'}
+            `;
         }
         if (registerBtn) {
             registerBtn.style.display = 'none';
         }
     }
 
+    showUserMenu() {
+        const menu = document.createElement('div');
+        menu.className = 'user-menu';
+        menu.innerHTML = `
+            <div class="user-menu-content">
+                <div class="user-info">
+                    ${this.currentUser.profile_picture ? 
+                        `<img src="${this.currentUser.profile_picture}" alt="Avatar" class="user-avatar">` : 
+                        '<div class="user-avatar-placeholder"><i class="fas fa-user"></i></div>'
+                    }
+                    <div>
+                        <div class="user-name">${this.currentUser.name}</div>
+                        <div class="user-email">${this.currentUser.email}</div>
+                    </div>
+                </div>
+                <div class="user-menu-actions">
+                    <button onclick="busReserva.viewMyReservations()">
+                        <i class="fas fa-ticket-alt"></i> Mis Reservas
+                    </button>
+                    <button onclick="busReserva.logout()">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // Remover menú existente
+        document.querySelector('.user-menu')?.remove();
+        
+        // Agregar nuevo menú
+        document.body.appendChild(menu);
+        
+        // Cerrar al hacer clic fuera
+        setTimeout(() => {
+            document.addEventListener('click', (e) => {
+                if (!menu.contains(e.target) && !document.getElementById('loginBtn').contains(e.target)) {
+                    menu.remove();
+                }
+            }, { once: true });
+        }, 100);
+    }
+
+    async logout() {
+        try {
+            await fetch('/auth/logout', { method: 'POST' });
+        } catch (error) {
+            console.error('Error en logout:', error);
+        } finally {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            this.currentUser = null;
+            window.location.reload();
+        }
+    }
+
+    async viewMyReservations() {
+        if (!this.currentUser) return;
+        
+        try {
+            const response = await fetch(`/api/reservations/${this.currentUser.id}`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            
+            if (response.ok) {
+                const reservations = await response.json();
+                this.showReservationsModal(reservations);
+            } else {
+                this.showNotification('Error cargando reservas', 'error');
+            }
+        } catch (error) {
+            console.error('Error cargando reservas:', error);
+            this.showNotification('Error de conexión', 'error');
+        }
+    }
+
+    showReservationsModal(reservations) {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay active';
+        modal.innerHTML = `
+            <div class="modal large">
+                <div class="modal-header">
+                    <h3>Mis Reservas</h3>
+                    <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    ${reservations.length === 0 ? 
+                        '<div class="no-reservations"><i class="fas fa-ticket-alt"></i><p>No tienes reservas aún</p></div>' :
+                        reservations.map(res => `
+                            <div class="reservation-card">
+                                <div class="reservation-header">
+                                    <h4>${res.origin} → ${res.destination}</h4>
+                                    <span class="status status-${res.status}">${res.status}</span>
+                                </div>
+                                <div class="reservation-details">
+                                    <div><i class="fas fa-calendar"></i> ${this.formatDate(res.departure_date)}</div>
+                                    <div><i class="fas fa-clock"></i> ${res.departure_time}</div>
+                                    <div><i class="fas fa-bus"></i> Bus ${res.bus_number}</div>
+                                    <div><i class="fas fa-chair"></i> Asiento ${res.seat_number}</div>
+                                    <div><i class="fas fa-dollar-sign"></i> $${res.total_price}</div>
+                                </div>
+                            </div>
+                        `).join('')
+                    }
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
     // === RESERVAS ===
     async bookSchedule(scheduleId) {
         if (!this.currentUser) {
-            this.showAuthModal('login');
+            window.location.href = '/auth.html';
             return;
         }
 
-        const passengers = parseInt(document.getElementById('passengerCount').textContent);
+        const seatNumber = Math.floor(Math.random() * 40) + 1; // Asiento aleatorio
         
         try {
             const response = await fetch('/api/reservations', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('userToken')}`
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
                 },
                 body: JSON.stringify({
+                    user_id: this.currentUser.id,
                     schedule_id: scheduleId,
-                    passengers: passengers
+                    seat_number: seatNumber
                 })
             });
 
@@ -800,6 +938,164 @@ const additionalStyles = `
 .booking-details {
     margin: var(--space-4) 0;
     text-align: left;
+}
+
+.user-menu {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--gray-200);
+    z-index: 2000;
+    min-width: 280px;
+    animation: slideInRight 0.2s ease-out;
+}
+
+.user-menu-content {
+    padding: var(--space-4);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--gray-100);
+    margin-bottom: var(--space-4);
+}
+
+.user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-avatar-placeholder {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray-500);
+}
+
+.user-name {
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.user-email {
+    font-size: var(--font-size-sm);
+    color: var(--gray-600);
+}
+
+.user-menu-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.user-menu-actions button {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    background: none;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition);
+    text-align: left;
+    width: 100%;
+}
+
+.user-menu-actions button:hover {
+    background: var(--gray-50);
+}
+
+.reservation-card {
+    background: var(--gray-50);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    margin-bottom: var(--space-4);
+}
+
+.reservation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-3);
+}
+
+.reservation-header h4 {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.status {
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.status-confirmada {
+    background: var(--success-light);
+    color: var(--success);
+}
+
+.status-pendiente {
+    background: var(--warning-light);
+    color: var(--warning);
+}
+
+.status-cancelada {
+    background: var(--error-light);
+    color: var(--error);
+}
+
+.reservation-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--space-3);
+    font-size: var(--font-size-sm);
+    color: var(--gray-600);
+}
+
+.reservation-details > div {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.no-reservations {
+    text-align: center;
+    padding: var(--space-8);
+    color: var(--gray-500);
+}
+
+.no-reservations i {
+    font-size: 48px;
+    margin-bottom: var(--space-4);
+    opacity: 0.5;
+}
+
+.modal.large {
+    max-width: 800px;
+    width: 90vw;
+}
+
+:root {
+    --success-light: #d4edda;
+    --warning-light: #fff3cd;
+    --error-light: #f8d7da;
 }
 </style>
 `;

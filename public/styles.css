@@ -4,7 +4,7 @@
     width: 20px;
     height: 20px;
     border: 3px solid #f3f3f3;
-    border-top: 3px solid #667eea;
+    border-top: 3px solid #1e3c72;
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -52,9 +52,9 @@
 }
 
 .seat.selected {
-    background: #667eea;
+    background: #1e3c72;
     color: white;
-    border-color: #667eea;
+    border-color: #1e3c72;
 }
 
 .price-tag {
@@ -68,10 +68,10 @@
 }
 
 .route-info {
-    background: #f8f9fa;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(30, 60, 114, 0.1) 100%);
     padding: 15px;
     border-radius: 10px;
-    border-left: 4px solid #667eea;
+    border-left: 4px solid #1e3c72;
     margin: 10px 0;
 }
 
@@ -110,12 +110,14 @@
     position: fixed;
     top: 20px;
     right: 20px;
-    background: white;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(30, 60, 114, 0.05) 100%);
     border-radius: 10px;
     padding: 15px 20px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 8px 25px rgba(30, 60, 114, 0.2);
     z-index: 1000;
     max-width: 300px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(30, 60, 114, 0.1);
 }
 
 .notification.success {

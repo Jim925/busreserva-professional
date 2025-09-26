@@ -3,17 +3,17 @@
 
 :root {
   /* Colores Ultra */
-  --ultra-primary: #6366f1;
-  --ultra-primary-dark: #4f46e5;
-  --ultra-secondary: #8b5cf6;
-  --ultra-accent: #06b6d4;
+  --ultra-primary: #1e3c72;
+  --ultra-primary-dark: #0f1f3c;
+  --ultra-secondary: #2a5298;
+  --ultra-accent: #ffffff;
   --ultra-success: #10b981;
   --ultra-warning: #f59e0b;
   --ultra-error: #ef4444;
   
   /* Gradientes */
-  --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  --gradient-secondary: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+  --gradient-primary: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  --gradient-secondary: linear-gradient(135deg, #2a5298 0%, #ffffff 100%);
   --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
   --gradient-warm: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   
@@ -89,7 +89,8 @@ body {
   font-size: var(--font-size-base);
   line-height: 1.6;
   color: var(--text-primary);
-  background: var(--surface-primary);
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #ffffff 100%);
+  background-attachment: fixed;
   overflow-x: hidden;
 }
 
@@ -202,7 +203,8 @@ body {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, rgba(255, 255, 255, 0.1) 100%);
+  backdrop-filter: blur(10px);
 }
 
 .hero-background {
@@ -312,7 +314,8 @@ body {
 /* Búsqueda Ultra */
 .search-ultra {
   padding: var(--space-3xl) 0;
-  background: var(--surface-secondary);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(30, 60, 114, 0.1) 100%);
+  backdrop-filter: blur(10px);
 }
 
 .search-header {
@@ -333,11 +336,12 @@ body {
 }
 
 .search-card {
-  background: white;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
   border-radius: var(--border-radius-2xl);
   padding: var(--space-3xl);
-  box-shadow: var(--shadow-2xl);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 25px 50px rgba(30, 60, 114, 0.2);
+  border: 1px solid rgba(30, 60, 114, 0.1);
 }
 
 .search-tabs {
@@ -558,7 +562,8 @@ body {
 /* Características Ultra */
 .features-ultra {
   padding: var(--space-3xl) 0;
-  background: white;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(30, 60, 114, 0.05) 100%);
+  backdrop-filter: blur(10px);
 }
 
 .features-header {
@@ -585,11 +590,12 @@ body {
 }
 
 .feature-card {
-  background: white;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
   padding: var(--space-2xl);
   border-radius: var(--border-radius-xl);
-  box-shadow: var(--shadow-lg);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 15px 35px rgba(30, 60, 114, 0.1);
+  border: 1px solid rgba(30, 60, 114, 0.1);
   transition: var(--transition-normal);
   position: relative;
   overflow: hidden;
@@ -653,8 +659,10 @@ body {
   right: -400px;
   width: 400px;
   height: calc(100vh - 70px);
-  background: white;
-  box-shadow: var(--shadow-2xl);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 25px 50px rgba(30, 60, 114, 0.2);
+  border-left: 1px solid rgba(30, 60, 114, 0.1);
   transition: var(--transition-normal);
   z-index: 999;
   overflow-y: auto;
@@ -768,9 +776,11 @@ body {
 }
 
 .modal-content {
-  background: white;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
   border-radius: var(--border-radius-xl);
-  box-shadow: var(--shadow-2xl);
+  box-shadow: 0 25px 50px rgba(30, 60, 114, 0.2);
+  border: 1px solid rgba(30, 60, 114, 0.1);
   max-width: 500px;
   width: 90%;
   max-height: 90vh;
