@@ -83,6 +83,19 @@ app.get('/api/routes', (req, res) => {
   });
 });
 
+app.post('/api/routes', (req, res) => {
+  const { origin, destination, price, duration } = req.body;
+  
+  db.query(
+    'INSERT INTO routes (origin, destination, price, duration) VALUES (?, ?, ?, ?)',
+    [origin, destination, price, duration],
+    (err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ id: result.insertId, message: 'Ruta creada exitosamente' });
+    }
+  );
+});
+
 app.post('/api/reservations', (req, res) => {
   const { user_name, user_email, route_id, seat_number, total_price } = req.body;
   

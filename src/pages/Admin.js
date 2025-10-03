@@ -1,21 +1,59 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import UnsplashImage from '../components/UnsplashImage';
+import { busService } from '../services/api';
+import toast from 'react-hot-toast';
 
 const Admin = () => {
-  const [activeTab, setActiveTab] = useState('buses');
+  const [activeTab, setActiveTab] = useState('rutas');
+  const [routes, setRoutes] = useState([]);
+  const [reservations, setReservations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [newRoute, setNewRoute] = useState({
+    origin: '',
+    destination: '',
+    price: '',
+    duration: ''
+  });
 
-  const mockBuses = [
-    { id: 1, placa: 'AQP-123', capacidad: 40, estado: 'Activo', ubicacion: 'Lima', pasajeros: 32 },
-    { id: 2, placa: 'LIM-456', capacidad: 35, estado: 'En Ruta', ubicacion: 'Arequipa', pasajeros: 28 },
-    { id: 3, placa: 'CUS-789', capacidad: 45, estado: 'Mantenimiento', ubicacion: 'Taller', pasajeros: 0 }
-  ];
+  useEffect(() => {
+    loadData();
+  }, []);
 
-  const mockRutas = [
-    { id: 1, origen: 'Lima', destino: 'Arequipa', duracion: '15h 30m', precio: 95 },
-    { id: 2, origen: 'Lima', destino: 'Cusco', duracion: '18h 45m', precio: 120 },
-    { id: 3, origen: 'Lima', destino: 'Trujillo', duracion: '8h 15m', precio: 65 }
-  ];
+  const loadData = async () => {
+    try {
+      const [routesData, reservationsData] = await Promise.all([
+        busService.getRoutes(),
+        busService.getReservations()
+      ]);
+      setRoutes(routesData);
+      setReservations(reservationsData);
+    } catch (error) {
+      toast.error('Error al cargar datos');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddRoute = async (e) => {
+    e.preventDefault();
+    try {
+      await fetch('http://localhost:3005/api/routes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          origin: newRoute.origin,
+          destination: newRoute.destination,
+          price: parseFloat(newRoute.price),
+          duration: newRoute.duration
+        })
+      });
+      toast.success('Ruta agregada exitosamente');
+      setNewRoute({ origin: '', destination: '', price: '', duration: '' });
+      loadData();
+    } catch (error) {
+      toast.error('Error al agregar ruta');
+    }
+  };
 
   return (
     <section className="section">
@@ -44,21 +82,6 @@ const Admin = () => {
           
           <div style={{ display: 'flex', gap: '24px', justifyContent: 'center', marginBottom: '48px' }}>
             <button 
-              onClick={() => setActiveTab('buses')}
-              style={{
-                background: activeTab === 'buses' ? '#0071e3' : 'transparent',
-                color: activeTab === 'buses' ? 'white' : '#f5f5f7',
-                border: activeTab === 'buses' ? 'none' : '1px solid #424245',
-                padding: '12px 24px',
-                borderRadius: '980px',
-                cursor: 'pointer',
-                fontSize: '17px',
-                fontFamily: '"SF Pro Display", sans-serif'
-              }}
-            >
-              Autobuses
-            </button>
-            <button 
               onClick={() => setActiveTab('rutas')}
               style={{
                 background: activeTab === 'rutas' ? '#0071e3' : 'transparent',
@@ -73,17 +96,108 @@ const Admin = () => {
             >
               Rutas
             </button>
+            <button 
+              onClick={() => setActiveTab('reservas')}
+              style={{
+                background: activeTab === 'reservas' ? '#0071e3' : 'transparent',
+                color: activeTab === 'reservas' ? 'white' : '#f5f5f7',
+                border: activeTab === 'reservas' ? 'none' : '1px solid #424245',
+                padding: '12px 24px',
+                borderRadius: '980px',
+                cursor: 'pointer',
+                fontSize: '17px',
+                fontFamily: '"SF Pro Display", sans-serif'
+              }}
+            >
+              Reservas
+            </button>
           </div>
         </motion.div>
 
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          {activeTab === 'buses' && (
+          {activeTab === 'rutas' && (
             <div>
-              <h2 className="title-2" style={{ marginBottom: '32px', textAlign: 'center' }}>Flota de autobuses</h2>
+              <h2 className="title-2" style={{ marginBottom: '32px', textAlign: 'center' }}>Gestión de Rutas</h2>
+              
+              <form onSubmit={handleAddRoute} style={{
+                background: '#1d1d1f',
+                borderRadius: '18px',
+                padding: '32px',
+                marginBottom: '32px',
+                display: 'grid',
+                gap: '16px'
+              }}>
+                <h3 className="headline" style={{ color: '#f5f5f7', marginBottom: '16px' }}>Agregar Nueva Ruta</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <input
+                    type="text"
+                    placeholder="Origen"
+                    value={newRoute.origin}
+                    onChange={(e) => setNewRoute({...newRoute, origin: e.target.value})}
+                    required
+                    style={{
+                      padding: '12px 16px',
+                      borderRadius: '8px',
+                      border: '1px solid #424245',
+                      background: '#2c2c2e',
+                      color: '#f5f5f7',
+                      fontSize: '16px'
+                    }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Destino"
+                    value={newRoute.destination}
+                    onChange={(e) => setNewRoute({...newRoute, destination: e.target.value})}
+                    required
+                    style={{
+                      padding: '12px 16px',
+                      borderRadius: '8px',
+                      border: '1px solid #424245',
+                      background: '#2c2c2e',
+                      color: '#f5f5f7',
+                      fontSize: '16px'
+                    }}
+                  />
+                  <input
+                    type="number"
+                    placeholder="Precio"
+                    value={newRoute.price}
+                    onChange={(e) => setNewRoute({...newRoute, price: e.target.value})}
+                    required
+                    style={{
+                      padding: '12px 16px',
+                      borderRadius: '8px',
+                      border: '1px solid #424245',
+                      background: '#2c2c2e',
+                      color: '#f5f5f7',
+                      fontSize: '16px'
+                    }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Duración (ej: 8h)"
+                    value={newRoute.duration}
+                    onChange={(e) => setNewRoute({...newRoute, duration: e.target.value})}
+                    style={{
+                      padding: '12px 16px',
+                      borderRadius: '8px',
+                      border: '1px solid #424245',
+                      background: '#2c2c2e',
+                      color: '#f5f5f7',
+                      fontSize: '16px'
+                    }}
+                  />
+                </div>
+                <button type="submit" className="btn" style={{ justifySelf: 'start' }}>
+                  Agregar Ruta
+                </button>
+              </form>
+              
               <div style={{ display: 'grid', gap: '20px' }}>
-                {mockBuses.map(bus => (
+                {routes.map(route => (
                   <div
-                    key={bus.id}
+                    key={route.id}
                     style={{
                       background: '#1d1d1f',
                       borderRadius: '18px',
@@ -95,54 +209,40 @@ const Admin = () => {
                   >
                     <div>
                       <h3 className="headline" style={{ margin: '0 0 8px 0', color: '#f5f5f7' }}>
-                        {bus.placa}
+                        {route.origin} → {route.destination}
                       </h3>
-                      <div className="body" style={{ color: '#a1a1a6', marginBottom: '4px' }}>
-                        Capacidad: {bus.capacidad} • Ubicación: {bus.ubicacion}
-                      </div>
-                      <div className="caption" style={{
-                        color: bus.estado === 'Activo' ? '#30d158' : 
-                               bus.estado === 'En Ruta' ? '#0071e3' : '#ff9f0a'
-                      }}>
-                        {bus.estado} • {bus.pasajeros}/{bus.capacidad} pasajeros
+                      <div className="body" style={{ color: '#a1a1a6' }}>
+                        {route.duration || '8h'} • S/{route.price}
                       </div>
                     </div>
-                    <button className="btn btn-secondary">
-                      Ver detalles
-                    </button>
                   </div>
                 ))}
               </div>
             </div>
           )}
 
-          {activeTab === 'rutas' && (
+          {activeTab === 'reservas' && (
             <div>
-              <h2 className="title-2" style={{ marginBottom: '32px', textAlign: 'center' }}>Gestión de rutas</h2>
+              <h2 className="title-2" style={{ marginBottom: '32px', textAlign: 'center' }}>Reservas Activas</h2>
               <div style={{ display: 'grid', gap: '20px' }}>
-                {mockRutas.map(ruta => (
+                {reservations.map(reservation => (
                   <div
-                    key={ruta.id}
+                    key={reservation.id}
                     style={{
                       background: '#1d1d1f',
                       borderRadius: '18px',
-                      padding: '32px',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center'
+                      padding: '32px'
                     }}
                   >
-                    <div>
-                      <h3 className="headline" style={{ margin: '0 0 8px 0', color: '#f5f5f7' }}>
-                        {ruta.origen} → {ruta.destino}
-                      </h3>
-                      <div className="body" style={{ color: '#a1a1a6' }}>
-                        {ruta.duracion} • €{ruta.precio}
-                      </div>
+                    <h3 className="headline" style={{ margin: '0 0 8px 0', color: '#f5f5f7' }}>
+                      {reservation.origin} → {reservation.destination}
+                    </h3>
+                    <div className="body" style={{ color: '#a1a1a6', marginBottom: '4px' }}>
+                      Cliente: {reservation.user_name} • {reservation.user_email}
                     </div>
-                    <button className="btn btn-secondary">
-                      Editar
-                    </button>
+                    <div className="caption" style={{ color: '#30d158' }}>
+                      Asiento {reservation.seat_number} • S/{reservation.total_price}
+                    </div>
                   </div>
                 ))}
               </div>

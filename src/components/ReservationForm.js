@@ -121,12 +121,13 @@ const ReservationForm = ({ onReservationCreated }) => {
             placeholder="ejemplo@email.com"
             style={{
               width: '100%',
-              padding: '12px 16px',
+              padding: '18px 20px',
               borderRadius: '8px',
               border: '1px solid #424245',
               background: '#2c2c2e',
               color: '#f5f5f7',
-              fontSize: '16px'
+              fontSize: '18px',
+              minHeight: '60px'
             }}
           />
         </div>

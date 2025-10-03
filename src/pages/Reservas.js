@@ -25,17 +25,17 @@ const Reservas = () => {
   };
 
   return (
-    <section className="section">
+    <section className="section" style={{ background: '#000', minHeight: '100vh' }}>
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          style={{ textAlign: 'center', marginBottom: '60px' }}
+          style={{ textAlign: 'center', marginBottom: '60px', paddingTop: '40px' }}
         >
-          <h1 className="title-1" style={{ marginBottom: '16px' }}>
-            Mis reservas
+          <h1 className="title-1" style={{ marginBottom: '16px', color: '#f5f5f7', fontSize: '48px', fontWeight: '700' }}>
+            Mis Reservas
           </h1>
-          <p className="body">
+          <p className="body" style={{ color: '#a1a1a6', fontSize: '20px' }}>
             Gestiona tus viajes programados
           </p>
         </motion.div>
@@ -55,12 +55,13 @@ const Reservas = () => {
         </motion.div>
         
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '60px' }}>
-            <div className="body" style={{ color: '#a1a1a6' }}>Cargando reservas...</div>
+          <div style={{ textAlign: 'center', padding: '60px', background: '#1d1d1f', borderRadius: '18px' }}>
+            <div className="body" style={{ color: '#a1a1a6', fontSize: '18px' }}>Cargando reservas...</div>
           </div>
         ) : reservas.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px' }}>
-            <div className="body" style={{ color: '#a1a1a6' }}>No tienes reservas aún</div>
+          <div style={{ textAlign: 'center', padding: '80px', background: '#1d1d1f', borderRadius: '18px' }}>
+            <div className="title-2" style={{ color: '#f5f5f7', marginBottom: '12px' }}>No tienes reservas aún</div>
+            <div className="body" style={{ color: '#a1a1a6' }}>Crea tu primera reserva usando el formulario de arriba</div>
           </div>
         ) : (
           <div style={{ display: 'grid', gap: '20px', maxWidth: '800px', margin: '0 auto' }}>
