@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = 'http://localhost:3005/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -10,13 +10,13 @@ const api = axios.create({
 });
 
 export const busService = {
-  // Búsqueda de viajes
-  searchTrips: async (searchData) => {
+  // Obtener todas las rutas
+  getRoutes: async () => {
     try {
-      const response = await api.post('/search', searchData);
+      const response = await api.get('/routes');
       return response.data;
     } catch (error) {
-      console.error('Error searching trips:', error);
+      console.error('Error getting routes:', error);
       throw error;
     }
   },
@@ -54,13 +54,13 @@ export const busService = {
     }
   },
 
-  // Admin - obtener rutas
-  getRoutes: async () => {
+  // Obtener reservas
+  getReservations: async () => {
     try {
-      const response = await api.get('/admin/routes');
+      const response = await api.get('/reservations');
       return response.data;
     } catch (error) {
-      console.error('Error getting routes:', error);
+      console.error('Error getting reservations:', error);
       throw error;
     }
   }

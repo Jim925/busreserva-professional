@@ -6,6 +6,7 @@ import BusList from '../components/BusList';
 import GoogleMap from '../components/GoogleMap';
 import UnsplashImage from '../components/UnsplashImage';
 import { useGeolocation } from '../hooks/useGeolocation';
+import { busService } from '../services/api';
 import toast from 'react-hot-toast';
 
 const Home = () => {
@@ -47,60 +48,35 @@ const Home = () => {
     return () => clearTimeout(timer);
   }, [currentPhrase, isDeleting, phraseIndex, phrases]);
 
-  const handleSearch = (searchData) => {
+  const handleSearch = async (searchData) => {
     toast.loading('Buscando viajes...', { id: 'search' });
     
-    setTimeout(() => {
-      const realResults = [
-        {
-          id: 1,
-          origen: searchData.origen,
-          destino: searchData.destino,
-          fecha: searchData.fecha,
-          hora: '06:30',
-          precio: 85,
-          asientosDisponibles: 12,
-          empresa: 'Cruz del Sur',
-          duracion: '12h 30m'
-        },
-        {
-          id: 2,
-          origen: searchData.origen,
-          destino: searchData.destino,
-          fecha: searchData.fecha,
-          hora: '08:00',
-          precio: 75,
-          asientosDisponibles: 18,
-          empresa: 'Oltursa',
-          duracion: '11h 45m'
-        },
-        {
-          id: 3,
-          origen: searchData.origen,
-          destino: searchData.destino,
-          fecha: searchData.fecha,
-          hora: '14:30',
-          precio: 95,
-          asientosDisponibles: 6,
-          empresa: 'Tepsa',
-          duracion: '10h 20m'
-        },
-        {
-          id: 4,
-          origen: searchData.origen,
-          destino: searchData.destino,
-          fecha: searchData.fecha,
-          hora: '22:00',
-          precio: 120,
-          asientosDisponibles: 3,
-          empresa: 'Civa',
-          duracion: '9h 15m'
-        }
-      ];
+    try {
+      const routes = await busService.getRoutes();
+      const filteredRoutes = routes.filter(route => 
+        route.origin.toLowerCase().includes(searchData.origen.toLowerCase()) &&
+        route.destination.toLowerCase().includes(searchData.destino.toLowerCase())
+      );
+      
+      const realResults = filteredRoutes.map(route => ({
+        id: route.id,
+        origen: route.origin,
+        destino: route.destination,
+        fecha: searchData.fecha,
+        hora: '08:00',
+        precio: route.price,
+        asientosDisponibles: Math.floor(Math.random() * 20) + 5,
+        empresa: 'BusReserva Pro',
+        duracion: route.duration || '8h'
+      }));
+      
       setSearchResults(realResults);
       setSelectedRoute({ origen: searchData.origen, destino: searchData.destino });
       toast.success(`${realResults.length} viajes encontrados!`, { id: 'search' });
-    }, 1500);
+    } catch (error) {
+      toast.error('Error al buscar viajes', { id: 'search' });
+      console.error('Error:', error);
+    }
   };
 
   return (
