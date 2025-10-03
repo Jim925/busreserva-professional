@@ -1,0 +1,327 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "SF Pro Display", "SF Pro Icons", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+  background: #000000;
+  min-height: 100vh;
+  color: #f5f5f7;
+  line-height: 1.47059;
+  font-weight: 400;
+  letter-spacing: -0.022em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    linear-gradient(135deg, transparent 0%, rgba(59, 130, 246, 0.02) 50%, transparent 100%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.App {
+  min-height: 100vh;
+  position: relative;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.card {
+  background: #000000;
+  border-radius: 18px;
+  padding: 80px 40px;
+  margin: 0;
+  border: none;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.btn {
+  background: #ffa502;
+  color: #ffffff;
+  border: none;
+  padding: 12px 23px;
+  border-radius: 980px;
+  cursor: pointer;
+  font-size: 17px;
+  font-weight: 400;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.6, 1);
+  letter-spacing: -0.022em;
+  font-family: "SF Pro Display", sans-serif;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn:hover {
+  background: #ff9500;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #ffa502;
+  border: 1px solid #ffa502;
+}
+
+.btn-secondary:hover {
+  background: #ffa502;
+  color: #ffffff;
+}
+
+.btn:hover {
+  background: #2563eb;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.btn-secondary {
+  background: #6b7280;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #4b5563;
+}
+
+.btn-outline {
+  background: transparent;
+  color: #3b82f6;
+  border: 1px solid #3b82f6;
+}
+
+.btn-outline:hover {
+  background: #3b82f6;
+  color: white;
+}
+
+.form-group {
+  margin-bottom: 25px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #f5f5f7;
+  font-size: 17px;
+  letter-spacing: -0.022em;
+}
+
+.form-group input, .form-group select {
+  width: 100%;
+  padding: 16px 20px;
+  border: 1px solid #424245;
+  border-radius: 12px;
+  font-size: 17px;
+  background: #1d1d1f;
+  color: #f5f5f7;
+  transition: all 0.3s ease;
+  font-family: "SF Pro Display", sans-serif;
+  letter-spacing: -0.022em;
+}
+
+.form-group input:focus, .form-group select:focus {
+  outline: none;
+  border-color: #0071e3;
+  box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
+}
+
+.form-group input::placeholder {
+  color: #86868b;
+}
+
+.form-group input::placeholder {
+  color: #9ca3af;
+}
+
+.form-group input::placeholder {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+/* Tipografía Apple exacta */
+.apple-text {
+  color: #ffa502;
+}
+
+.large-title {
+  font-size: 56px;
+  font-weight: 600;
+  line-height: 1.07143;
+  letter-spacing: -0.005em;
+  color: #f5f5f7;
+}
+
+.title-1 {
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: 0;
+  color: #f5f5f7;
+}
+
+.title-2 {
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.125;
+  letter-spacing: 0.004em;
+  color: #f5f5f7;
+}
+
+.title-3 {
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.14286;
+  letter-spacing: 0.007em;
+  color: #f5f5f7;
+}
+
+.headline {
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.19048;
+  letter-spacing: 0.011em;
+  color: #f5f5f7;
+}
+
+.body {
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.47059;
+  letter-spacing: -0.022em;
+  color: #a1a1a6;
+}
+
+.caption {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.33337;
+  letter-spacing: -0.01em;
+  color: #86868b;
+}
+
+/* Secciones Apple */
+.hero-section {
+  background: #000000;
+  padding: 60px 0 80px;
+  text-align: center;
+}
+
+.section {
+  background: #000000;
+  padding: 80px 0;
+}
+
+.section-light {
+  background: #f5f5f7;
+  color: #1d1d1f;
+}
+
+.section-light .title-1,
+.section-light .title-2,
+.section-light .title-3,
+.section-light .headline {
+  color: #1d1d1f !important;
+}
+
+.section-light .body {
+  color: #86868b !important;
+}
+
+.section-light .caption {
+  color: #86868b !important;
+}
+
+.section-light .apple-text {
+  color: #ffa502 !important;
+}
+
+.container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 22px;
+}
+
+/* Utilidades profesionales */
+.text-primary {
+  color: #3b82f6;
+}
+
+.text-secondary {
+  color: #6b7280;
+}
+
+.text-success {
+  color: #10b981;
+}
+
+.text-warning {
+  color: #f59e0b;
+}
+
+.text-error {
+  color: #ef4444;
+}
+
+.bg-primary {
+  background-color: #3b82f6;
+}
+
+.bg-secondary {
+  background-color: #f3f4f6;
+}
+
+.shadow-sm {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.shadow-md {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+}
+
+.rounded {
+  border-radius: 8px;
+}
+
+.rounded-lg {
+  border-radius: 12px;
+}
+
+/* Scrollbar profesional */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

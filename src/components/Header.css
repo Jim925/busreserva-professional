@@ -1,0 +1,131 @@
+.header {
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+  height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.header .container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+}
+
+.nav-brand h1 {
+  color: #f5f5f7;
+  font-size: 21px;
+  font-weight: 600;
+  margin: 0;
+  font-family: "SF Pro Display", sans-serif;
+  letter-spacing: -0.022em;
+}
+
+.nav-brand h1 .company-name {
+  color: #f5f5f7;
+}
+
+.nav-menu {
+  display: flex;
+  gap: 40px;
+  align-items: center;
+  height: 44px;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: rgba(245, 245, 247, 0.88);
+  font-weight: 400;
+  font-size: 12px;
+  transition: color 0.3s ease;
+  font-family: "SF Pro Text", sans-serif;
+  letter-spacing: -0.01em;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+}
+
+.nav-link:hover {
+  color: #f5f5f7;
+}
+
+.nav-link.active {
+  color: #f5f5f7;
+}
+
+.nav-link.btn-style {
+  background: #ffa502;
+  color: white;
+  padding: 4px 11px;
+  border-radius: 18px;
+  font-size: 12px;
+  min-height: 28px;
+}
+
+.nav-link.btn-style:hover {
+  background: #ff9500;
+  color: white;
+}
+
+.nav-link.btn-admin {
+  background: #2c3e50;
+  color: white;
+  padding: 4px 11px;
+  border-radius: 18px;
+  font-size: 12px;
+  min-height: 28px;
+}
+
+.nav-link.btn-admin:hover {
+  background: #34495e;
+  color: white;
+}
+
+@media (max-width: 1200px) {
+  .nav-menu {
+    gap: 12px;
+  }
+  
+  .nav-link {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 12px 0;
+  }
+  
+  .nav-menu {
+    gap: 8px;
+    justify-content: center;
+    width: 100%;
+    margin-top: 12px;
+  }
+  
+  .nav-link {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  
+  .nav-brand h1 {
+    font-size: 18px;
+  }
+  
+  .nav-brand h1 .logo {
+    font-size: 20px;
+  }
+  
+  .header .container {
+    flex-direction: column;
+    align-items: center;
+  }
+}
