@@ -41,7 +41,7 @@ const Reservas = () => {
         </motion.div>
         
         <div style={{ marginBottom: '60px' }}>
-          <ReservationForm />
+          <ReservationForm onReservationCreated={loadReservations} />
         </div>
         
         <motion.div
@@ -81,10 +81,10 @@ const Reservas = () => {
                     {reserva.origin} → {reserva.destination}
                   </h3>
                   <div className="body" style={{ color: '#a1a1a6', marginBottom: '4px' }}>
-                    {new Date(reserva.created_at).toLocaleDateString()} • Asiento {reserva.seat_number}
+                    {new Date(reserva.created_at).toLocaleDateString('es-PE')} • Asiento {reserva.seat_number}
                   </div>
                   <div className="caption" style={{ color: '#86868b' }}>
-                    Cliente: {reserva.user_name}
+                    {reserva.user_name} • {reserva.user_email}
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>

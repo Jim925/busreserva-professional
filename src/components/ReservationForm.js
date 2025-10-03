@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { busService } from '../services/api';
 import toast from 'react-hot-toast';
 
-const ReservationForm = () => {
+const ReservationForm = ({ onReservationCreated }) => {
   const [routes, setRoutes] = useState([]);
   const [formData, setFormData] = useState({
     user_name: '',
@@ -48,6 +48,11 @@ const ReservationForm = () => {
         route_id: '',
         seat_number: Math.floor(Math.random() * 40) + 1
       });
+      
+      // Notify parent to reload reservations
+      if (onReservationCreated) {
+        onReservationCreated();
+      }
     } catch (error) {
       toast.error('Error al crear la reserva');
       console.error('Error:', error);
@@ -90,6 +95,7 @@ const ReservationForm = () => {
             value={formData.user_name}
             onChange={handleChange}
             required
+            placeholder="Ej: Juan Pérez"
             style={{
               width: '100%',
               padding: '12px 16px',
@@ -112,6 +118,7 @@ const ReservationForm = () => {
             value={formData.user_email}
             onChange={handleChange}
             required
+            placeholder="ejemplo@email.com"
             style={{
               width: '100%',
               padding: '12px 16px',
@@ -154,7 +161,7 @@ const ReservationForm = () => {
 
         <div>
           <label className="body" style={{ color: '#a1a1a6', marginBottom: '8px', display: 'block' }}>
-            Asiento asignado
+            Asiento (1-40)
           </label>
           <input
             type="number"
@@ -164,6 +171,7 @@ const ReservationForm = () => {
             min="1"
             max="40"
             required
+            placeholder="Ej: 15"
             style={{
               width: '100%',
               padding: '12px 16px',
@@ -175,6 +183,22 @@ const ReservationForm = () => {
             }}
           />
         </div>
+        
+        {formData.route_id && (
+          <div style={{
+            background: '#2c2c2e',
+            borderRadius: '8px',
+            padding: '16px',
+            border: '1px solid #424245'
+          }}>
+            <div className="caption" style={{ color: '#a1a1a6', marginBottom: '8px' }}>
+              Resumen de la reserva:
+            </div>
+            <div className="body" style={{ color: '#f5f5f7' }}>
+              Precio: S/{routes.find(r => r.id === parseInt(formData.route_id))?.price || 0}
+            </div>
+          </div>
+        )}
 
         <button
           type="submit"
