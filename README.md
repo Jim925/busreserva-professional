@@ -21,11 +21,15 @@ Sistema profesional de reserva de autobuses desarrollado con Node.js, Express y 
 git clone https://github.com/Jim925/busreserva-professional.git
 cd busreserva-professional
 
-# Instalar dependencias
+# Para la aplicación React (Puerto 3001)
+cd busreserva-react
 npm install
-
-# Iniciar servidor
 npm start
+
+# Para el backend API (Puerto 3000)
+cd ..
+npm install
+node server.js
 ```
 
 ## 📋 Requisitos
@@ -36,7 +40,8 @@ npm start
 
 ## 🌐 URLs del Sistema
 
-- **Principal:** http://localhost:3000
+- **React App:** http://localhost:3001
+- **Backend API:** http://localhost:3000
 - **Admin:** http://localhost:3000/admin.html
 - **Inicializar BD:** http://localhost:3000/init-db
 
@@ -44,13 +49,17 @@ npm start
 
 ```
 busreserva-professional/
-├── public/                 # Archivos estáticos
-│   ├── index.html         # Interfaz principal
+├── busreserva-react/       # Aplicación React (Puerto 3001)
+│   ├── src/               # Código fuente React
+│   ├── public/            # Archivos públicos React
+│   └── package.json       # Dependencias React
+├── public/                # Archivos estáticos backend
+│   ├── index.html         # Interfaz HTML clásica
 │   ├── admin.html         # Panel administrativo
 │   └── *.css              # Estilos
-├── server.js              # Servidor principal
+├── server.js              # Servidor backend (Puerto 3000)
 ├── database.sql           # Esquema de base de datos
-└── package.json           # Dependencias
+└── package.json           # Dependencias backend
 ```
 
 ## 🎨 Versiones Disponibles
