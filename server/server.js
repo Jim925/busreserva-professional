@@ -28,9 +28,18 @@ db.query('CREATE DATABASE IF NOT EXISTS busreserva', (err) => {
   });
 });
 
+const bcrypt = require('bcryptjs');
+
 // Crear tablas
 app.get('/api/init-db', (req, res) => {
   const tables = [
+    `CREATE TABLE IF NOT EXISTS users (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      name VARCHAR(100) NOT NULL,
+      email VARCHAR(100) UNIQUE NOT NULL,
+      password VARCHAR(255) NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )`,
     `CREATE TABLE IF NOT EXISTS routes (
       id INT AUTO_INCREMENT PRIMARY KEY,
       origin VARCHAR(100) NOT NULL,
@@ -120,6 +129,57 @@ app.get('/api/reservations', (req, res) => {
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(results);
+  });
+});
+
+// Auth APIs
+app.post('/api/register', async (req, res) => {
+  const { name, email, password } = req.body;
+  
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    db.query(
+      'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
+      [name, email, hashedPassword],
+      (err, result) => {
+        if (err) {
+          if (err.code === 'ER_DUP_ENTRY') {
+            return res.status(400).json({ error: 'El email ya está registrado' });
+          }
+          return res.status(500).json({ error: err.message });
+        }
+        res.json({ id: result.insertId, message: 'Usuario registrado exitosamente' });
+      }
+    );
+  } catch (error) {
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+app.post('/api/login', async (req, res) => {
+  const { email, password } = req.body;
+  
+  db.query('SELECT * FROM users WHERE email = ?', [email], async (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    
+    if (results.length === 0) {
+      return res.status(400).json({ error: 'Email no encontrado' });
+    }
+    
+    const user = results[0];
+    const isMatch = await bcrypt.compare(password, user.password);
+    
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Contraseña incorrecta' });
+    }
+    
+    res.json({ 
+      id: user.id, 
+      name: user.name, 
+      email: user.email, 
+      message: 'Inicio de sesión exitoso' 
+    });
   });
 });
 
