@@ -74,7 +74,7 @@ src/
 
 ## 🌐 URLs y Puertos
 
-- **React App:** http://localhost:3001
+- **React App:** http://localhost:3001 (Puerto por defecto)
 - **Backend API:** http://localhost:3000
 - **Socket.IO:** ws://localhost:3000
 
